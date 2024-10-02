@@ -1,30 +1,51 @@
 defmodule EctoPress.MixProject do
   use Mix.Project
 
+  @version "0.1.0"
+  @source_url "https://github.com/jakeprem/ecto_press"
+  @elixir_version "~> 1.17"
+
   def project do
     [
       app: :ecto_press,
-      version: "0.1.0",
-      elixir: "~> 1.17",
+      version: @version,
+      elixir: @elixir_version,
+      deps: deps(),
+      package: package(),
       elixirc_paths: elixirc_paths(Mix.env()),
-      start_permanent: Mix.env() == :prod,
-      deps: deps()
+      name: "EctoPress",
+      docs: docs(),
+      description: "Automate context boilerplate."
     ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
-  # Run "mix help compile.app" to learn about applications.
-  def application do
+  defp package do
     [
-      extra_applications: [:logger]
+      name: "EctoPress",
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => @source_url
+      },
+      maintainers: ["Jake Prem"]
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
+  defp docs do
+    [
+      source_ref: "v#{@version}",
+      main: "EctoPress",
+      source_url: @source_url,
+      homepage_url: @source_url,
+      extras: ["README.md"]
+    ]
+  end
+
   defp deps do
     [
+      {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:ecto, "~> 3.12"},
       {:inflex, "~> 2.1"}
     ]

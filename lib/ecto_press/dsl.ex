@@ -1,6 +1,18 @@
 defmodule EctoPress.DSL do
+  @moduledoc """
+  DSL for defining resources and generating context functions.
+  """
+
+  @doc """
+  Use this module to setup your context module.
+
+  ## Options
+    - `:repo`: The repo to use for the resources.
+    - `:resource_provider`: The resource provider to use for the resources. Defaults to `EctoPress.BaseResourceProvider`. Must implement the `EctoPress.ResourceProvider` behaviour.
+  """
   defmacro __using__(opts), do: using_macro(opts)
 
+  @doc false
   def using_macro(opts) do
     quote do
       import EctoPress.DSL
@@ -10,6 +22,15 @@ defmodule EctoPress.DSL do
     end
   end
 
+  @doc """
+  Define a resource to have context functions generated for it.
+
+  ## Options
+
+    - `:plural`: The plural name of the resource. Defaults to the pluralized form of the name.
+    - `:repo`: The repo to use for the resource. Defaults to the repo set in the DSL.
+    - `:resource_provider`: The resource provider to use for the resource. Defaults to the resource provider set in the DSL. Must implement the `EctoPress.ResourceProvider` behaviour.
+  """
   defmacro resource(name, schema, opts \\ []) do
     quote do
       @ecto_press_resources {unquote(name), unquote(schema), unquote(opts)}
