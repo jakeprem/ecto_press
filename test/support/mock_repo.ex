@@ -7,10 +7,19 @@ defmodule EctoPress.Test.MockRepo do
 
   alias EctoPress.Test.MockSchema
 
-  def get(MockSchema, 1), do: %MockSchema{id: 1, name: "Test"}
-  def get(MockSchema, _), do: nil
+  def get(MockSchema, 1, _opts), do: %MockSchema{id: 1, name: "Test"}
+  def get(MockSchema, _id, _opts), do: nil
 
-  def all(MockSchema),
+  def get!(MockSchema, 1, _opts), do: %MockSchema{id: 1, name: "Test"}
+  def get!(MockSchema, _id, _opts), do: raise("TEST NO RESULTS")
+
+  def get_by(MockSchema, [id: 1], _opts), do: %MockSchema{id: 1, name: "Test"}
+  def get_by(MockSchema, _clauses, _opts), do: nil
+
+  def get_by!(MockSchema, [id: 1], _opts), do: %MockSchema{id: 1, name: "Test"}
+  def get_by!(MockSchema, _clauses, _opts), do: raise("TEST NO RESULTS")
+
+  def all(MockSchema, _opts \\ []),
     do: [%MockSchema{id: 1, name: "Test"}, %MockSchema{id: 2, name: "Test 2"}]
 
   def insert(%Ecto.Changeset{valid?: true, changes: changes}) do

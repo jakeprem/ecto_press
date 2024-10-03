@@ -25,8 +25,28 @@ defmodule EctoPress.BaseResourceProvider do
       end
 
       @impl EctoPress.ResourceProvider
+      def get!(repo, schema, id, opts) do
+        BaseResourceProvider.get!(repo, schema, id, opts)
+      end
+
+      @impl EctoPress.ResourceProvider
+      def get_by(repo, schema, clauses, opts) do
+        BaseResourceProvider.get_by(repo, schema, clauses, opts)
+      end
+
+      @impl EctoPress.ResourceProvider
+      def get_by!(repo, schema, clauses, opts) do
+        BaseResourceProvider.get_by!(repo, schema, clauses, opts)
+      end
+
+      @impl EctoPress.ResourceProvider
       def fetch(repo, schema, id, opts) do
         BaseResourceProvider.fetch(repo, schema, id, opts)
+      end
+
+      @impl EctoPress.ResourceProvider
+      def fetch_by(repo, schema, clauses, opts) do
+        BaseResourceProvider.fetch_by(repo, schema, clauses, opts)
       end
 
       @impl EctoPress.ResourceProvider
@@ -45,8 +65,8 @@ defmodule EctoPress.BaseResourceProvider do
       end
 
       @impl EctoPress.ResourceProvider
-      def list(repo, schema, opts) do
-        BaseResourceProvider.list(repo, schema, opts)
+      def list(repo, schema, clauses, opts) do
+        BaseResourceProvider.list(repo, schema, clauses, opts)
       end
 
       @impl EctoPress.ResourceProvider
@@ -64,22 +84,57 @@ defmodule EctoPress.BaseResourceProvider do
 
   @impl true
   @doc """
-  Get a resource by id using the given repo and schema.
-
-  Opts are ignored.
+  Calls `get/3` on the given repo with the given schema, id, and opts.
   """
-  def get(repo, schema, id, _opts) do
-    repo.get(schema, id)
+  def get(repo, schema, id, opts) do
+    repo.get(schema, id, opts)
+  end
+
+  @impl true
+  @doc """
+  Calls `get!/3` on the given repo with the given schema, id, and opts.
+  """
+  def get!(repo, schema, id, opts) do
+    repo.get!(schema, id, opts)
+  end
+
+  @impl true
+  @doc """
+  Calls `get_by/3` on the given repo with the given schema and opts.
+  """
+  def get_by(repo, schema, clauses, opts) do
+    repo.get_by(schema, clauses, opts)
+  end
+
+  @impl true
+  @doc """
+  Calls `get_by!/3` on the given repo with the given schema and opts.
+  """
+  def get_by!(repo, schema, clauses, opts) do
+    repo.get_by!(schema, clauses, opts)
   end
 
   @impl true
   @doc """
   Fetch a resource by id using the given repo and schema.
 
-  Opts are ignored.
+  Delegates to `get/4`.
   """
   def fetch(repo, schema, id, opts) do
     case get(repo, schema, id, opts) do
+      nil -> {:error, :not_found}
+      resource -> {:ok, resource}
+    end
+  end
+
+  @impl true
+  @doc """
+  Fetch a resource by clauses using the given repo and schema.
+
+  Delegates to `get_by/4`.
+  """
+  def fetch_by(repo, schema, clauses, opts) do
+    case get_by(repo, schema, clauses, opts) do
       nil -> {:error, :not_found}
       resource -> {:ok, resource}
     end
@@ -131,10 +186,10 @@ defmodule EctoPress.BaseResourceProvider do
     - `:preload`: The preloads to use.
     - `:where`: The where clause to use. Passed through to `Ecto.Query.where/2`.
   """
-  def list(repo, schema, opts) do
+  def list(repo, schema, clauses, opts) do
     schema
-    |> apply_options(opts)
-    |> repo.all()
+    |> apply_options(clauses)
+    |> repo.all(opts)
   end
 
   @impl true

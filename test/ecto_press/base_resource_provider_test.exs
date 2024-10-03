@@ -18,6 +18,43 @@ defmodule EctoPress.BaseResourceProviderTest do
     end
   end
 
+  describe "get!/4" do
+    test "returns the resource when found" do
+      assert %MockSchema{id: 1, name: "Test"} =
+               BaseResourceProvider.get!(MockRepo, MockSchema, 1, [])
+    end
+
+    test "raises when not found" do
+      assert_raise RuntimeError, fn ->
+        BaseResourceProvider.get!(MockRepo, MockSchema, 2, [])
+      end
+    end
+  end
+
+  describe "get_by/4" do
+    test "returns the resource when found" do
+      assert %MockSchema{id: 1, name: "Test"} =
+               BaseResourceProvider.get_by(MockRepo, MockSchema, [id: 1], [])
+    end
+
+    test "returns nil when not found" do
+      assert is_nil(BaseResourceProvider.get_by(MockRepo, MockSchema, [id: 2], []))
+    end
+  end
+
+  describe "get_by!/4" do
+    test "returns the resource when found" do
+      assert %MockSchema{id: 1, name: "Test"} =
+               BaseResourceProvider.get_by!(MockRepo, MockSchema, [id: 1], [])
+    end
+
+    test "raises when not found" do
+      assert_raise RuntimeError, fn ->
+        BaseResourceProvider.get_by!(MockRepo, MockSchema, [id: 2], [])
+      end
+    end
+  end
+
   describe "fetch/4" do
     test "returns {:ok, resource} when found" do
       assert {:ok, %MockSchema{id: 1, name: "Test"}} =
@@ -26,6 +63,18 @@ defmodule EctoPress.BaseResourceProviderTest do
 
     test "returns {:error, :not_found} when not found" do
       assert {:error, :not_found} = BaseResourceProvider.fetch(MockRepo, MockSchema, 2, [])
+    end
+  end
+
+  describe "fetch_by/4" do
+    test "returns {:ok, resource} when found" do
+      assert {:ok, %MockSchema{id: 1, name: "Test"}} =
+               BaseResourceProvider.fetch_by(MockRepo, MockSchema, [id: 1], [])
+    end
+
+    test "returns {:error, :not_found} when not found" do
+      assert {:error, :not_found} =
+               BaseResourceProvider.fetch_by(MockRepo, MockSchema, [id: 2], [])
     end
   end
 
@@ -63,7 +112,8 @@ defmodule EctoPress.BaseResourceProviderTest do
 
   describe "list/3" do
     test "returns all resources" do
-      assert [%MockSchema{}, %MockSchema{}] = BaseResourceProvider.list(MockRepo, MockSchema, [])
+      assert [%MockSchema{}, %MockSchema{}] =
+               BaseResourceProvider.list(MockRepo, MockSchema, [], [])
     end
   end
 

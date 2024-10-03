@@ -19,10 +19,19 @@ defmodule EctoPress.ResourceProvider do
   @callback get(repo :: module(), schema :: module(), id(), opts()) ::
               schema() | nil
 
-  @doc """
-  Fetches a single record by its ID, returning an ok or error tuple.
-  """
+  @callback get!(repo :: module(), schema :: module(), id(), opts()) ::
+              schema()
+
+  @callback get_by(repo :: module(), schema :: module(), clauses :: opts(), opts()) ::
+              schema() | nil
+
+  @callback get_by!(repo :: module(), schema :: module(), clauses :: opts(), opts()) ::
+              schema()
+
   @callback fetch(repo :: module(), schema :: module(), id(), opts()) ::
+              {:ok, schema()} | {:error, :not_found | atom()}
+
+  @callback fetch_by(repo :: module(), schema :: module(), clauses :: opts(), opts()) ::
               {:ok, schema()} | {:error, :not_found | atom()}
 
   @doc """
@@ -46,7 +55,7 @@ defmodule EctoPress.ResourceProvider do
   @doc """
   Lists records with options for filtering, sorting, and pagination.
   """
-  @callback list(repo :: module(), schema :: module(), opts()) ::
+  @callback list(repo :: module(), schema :: module(), clauses :: opts(), opts()) ::
               [schema()]
 
   @doc """
@@ -57,11 +66,15 @@ defmodule EctoPress.ResourceProvider do
 
   @optional_callbacks [
     get: 4,
+    get!: 4,
+    get_by: 4,
+    get_by!: 4,
     fetch: 4,
+    fetch_by: 4,
     create: 4,
     update: 5,
     delete: 4,
-    list: 3,
+    list: 4,
     changeset: 3
   ]
 end

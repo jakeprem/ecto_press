@@ -103,7 +103,20 @@ defmodule EctoPress.DSL do
   end
 
   defp get_functions_to_generate(opts) do
-    default_functions = [:get, :fetch, :create, :update, :delete, :list, :changeset, :change]
+    default_functions = [
+      :get,
+      :get!,
+      :get_by,
+      :get_by!,
+      :fetch,
+      :fetch_by,
+      :create,
+      :update,
+      :delete,
+      :list,
+      :changeset,
+      :change
+    ]
 
     cond do
       opts[:only] -> Enum.filter(default_functions, &(&1 in opts[:only]))
@@ -123,7 +136,7 @@ defmodule EctoPress.DSL do
        ) do
     quote location: :keep do
       @doc """
-      Retrieves a single #{unquote(name)} by ID.
+      Gets a single #{unquote(name)} by ID.
 
       ## Parameters
 
@@ -145,6 +158,112 @@ defmodule EctoPress.DSL do
       """
       def unquote(:"get_#{name}")(id, opts \\ []) do
         unquote(resource_provider).get(unquote(repo), unquote(schema), id, opts)
+      end
+    end
+  end
+
+  defp generate_function(
+         :get!,
+         name,
+         _plural_name,
+         schema,
+         repo,
+         resource_provider,
+         _resource_opts
+       ) do
+    quote location: :keep do
+      @doc """
+      Gets a single #{unquote(name)} by ID.
+
+      Raises if not found. See `#{unquote(resource_provider)}.get!/3` and `#{unquote(repo)}.get!/3` for more information.
+
+      ## Parameters
+
+        - id: The ID of the #{unquote(name)} to retrieve.
+        - opts: A keyword list of options. See `#{unquote(resource_provider)}.get/4` for available options.
+
+      ## Returns
+
+        - The #{unquote(schema)} struct if found.
+        - Raises if not found.
+
+      ## Examples
+
+          iex> get_#{unquote(name)}(1)
+          %#{unquote(schema)}{id: 1, ...}
+      """
+      def unquote(:"get_#{name}!")(id, opts \\ []) do
+        unquote(resource_provider).get!(unquote(repo), unquote(schema), id, opts)
+      end
+    end
+  end
+
+  defp generate_function(
+         :get_by,
+         name,
+         _plural_name,
+         schema,
+         repo,
+         resource_provider,
+         _resource_opts
+       ) do
+    quote location: :keep do
+      @doc """
+      Retrieves a single #{unquote(name)} by the provided opts.
+
+      ## Parameters
+        - opts: A keyword list of options. See `#{unquote(resource_provider)}.get_by/3` and `#{unquote(repo)}.get_by/3` for available options.
+
+      ## Returns
+
+        - The #{unquote(schema)} struct if found.
+        - nil if not found or not authorized.
+
+      ## Examples
+
+          iex> get_#{unquote(name)}_by([option: value])
+          %#{unquote(schema)}{...}
+
+          iex> get_#{unquote(name)}_by([option: value])
+          %#{unquote(schema)}{...}
+      """
+      def unquote(:"get_#{name}_by")(clauses, opts \\ []) do
+        unquote(resource_provider).get_by(unquote(repo), unquote(schema), clauses, opts)
+      end
+    end
+  end
+
+  defp generate_function(
+         :get_by!,
+         name,
+         _plural_name,
+         schema,
+         repo,
+         resource_provider,
+         _resource_opts
+       ) do
+    quote location: :keep do
+      @doc """
+      Retrieves a single #{unquote(name)} by the provided opts.
+
+      Raises if not found. See `#{unquote(resource_provider)}.get_by!/3` and `#{unquote(repo)}.get_by!/2` for more information.
+
+      ## Parameters
+        - clauses: A keyword list of query clauses.
+        - opts: A keyword list of options. See `#{unquote(resource_provider)}.get_by/3` for available options.
+
+      ## Returns
+
+        - The #{unquote(schema)} struct if found.
+        - Raises if not found.
+
+      ## Examples
+
+          iex> get_#{unquote(name)}_by!([option: value])
+          %#{unquote(schema)}{...}
+      """
+      def unquote(:"get_#{name}_by!")(clauses, opts \\ []) do
+        unquote(resource_provider).get_by!(unquote(repo), unquote(schema), clauses, opts)
       end
     end
   end
@@ -183,6 +302,43 @@ defmodule EctoPress.DSL do
       """
       def unquote(:"fetch_#{name}")(id, opts \\ []) do
         unquote(resource_provider).fetch(unquote(repo), unquote(schema), id, opts)
+      end
+    end
+  end
+
+  defp generate_function(
+         :fetch_by,
+         name,
+         _plural_name,
+         schema,
+         repo,
+         resource_provider,
+         _resource_opts
+       ) do
+    quote location: :keep do
+      @doc """
+      Fetches a single #{unquote(name)} by the provided opts.
+
+      ## Parameters
+        - clauses: A keyword list of query clauses.
+        - opts: A keyword list of options. See `#{unquote(resource_provider)}.fetch_by/3` for available options.
+
+      ## Returns
+
+        - `{:ok, #{unquote(schema)}}` if the #{unquote(name)} was found.
+        - `{:error, :not_found}` if the #{unquote(name)} was not found.
+        - Other error tuples as defined in `#{unquote(resource_provider)}.fetch_by/3`.
+
+      ## Examples
+
+          iex> fetch_#{unquote(name)}_by([option: value])
+          {:ok, %#{unquote(schema)}{...}}
+
+          iex> fetch_#{unquote(name)}_by([option: value])
+          {:error, :not_found}
+      """
+      def unquote(:"fetch_#{name}_by")(clauses, opts \\ []) do
+        unquote(resource_provider).fetch_by(unquote(repo), unquote(schema), clauses, opts)
       end
     end
   end
@@ -322,7 +478,7 @@ defmodule EctoPress.DSL do
       Lists #{unquote(plural_name)}.
 
       ## Parameters
-
+        - clauses: A keyword list of clauses to be applied to the query. See `#{unquote(resource_provider)}.list/3` for available options.
         - opts: A keyword list of options. See `#{unquote(resource_provider)}.list/3` for available options.
 
       ## Returns
@@ -337,8 +493,8 @@ defmodule EctoPress.DSL do
           iex> list_#{unquote(plural_name)}([option: value])
           [%#{unquote(schema)}{}, ...]
       """
-      def unquote(:"list_#{plural_name}")(opts \\ []) do
-        unquote(resource_provider).list(unquote(repo), unquote(schema), opts)
+      def unquote(:"list_#{plural_name}")(clauses \\ [], opts \\ []) do
+        unquote(resource_provider).list(unquote(repo), unquote(schema), clauses, opts)
       end
     end
   end
