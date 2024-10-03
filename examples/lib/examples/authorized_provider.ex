@@ -48,10 +48,10 @@ defmodule Examples.AuthorizedProvider do
     end
   end
 
-  def list(repo, schema, opts) do
+  def list(repo, schema, clauses, opts) do
     case authorize(schema, :list, opts[:context]) do
       :unauthorized -> {:error, :unauthorized}
-      :authorized -> super(repo, schema, opts)
+      :authorized -> super(repo, schema, clauses, opts)
     end
   end
 end

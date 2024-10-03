@@ -2,13 +2,17 @@ defmodule Examples.Post do
   use Ecto.Schema
   import Ecto.Changeset
 
-  embedded_schema do
-    field(:name, :string)
+  schema "posts" do
+    field :title, :string
+    field :body, :string
+    belongs_to :user, Examples.User
+
+    timestamps()
   end
 
   def changeset(%__MODULE__{} = post, attrs) do
     post
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, [:title, :body, :user_id])
+    |> validate_required([:title, :body])
   end
 end
