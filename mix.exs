@@ -3,7 +3,7 @@ defmodule EctoPress.MixProject do
 
   @version "0.1.0"
   @source_url "https://github.com/jakeprem/ecto_press"
-  @elixir_version "~> 1.17"
+  @elixir_version "~> 1.15"
 
   def project do
     [
@@ -13,7 +13,6 @@ defmodule EctoPress.MixProject do
       deps: deps(),
       package: package(),
       elixirc_paths: elixirc_paths(Mix.env()),
-      name: "EctoPress",
       docs: docs(),
       description: "Automate context boilerplate."
     ]
@@ -24,7 +23,7 @@ defmodule EctoPress.MixProject do
 
   defp package do
     [
-      name: "EctoPress",
+      name: :ecto_press,
       licenses: ["MIT"],
       links: %{
         "GitHub" => @source_url
