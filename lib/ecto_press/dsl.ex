@@ -27,9 +27,25 @@ defmodule EctoPress.DSL do
 
   ## Options
 
-    - `:plural`: The plural name of the resource. Defaults to the pluralized form of the name.
-    - `:repo`: The repo to use for the resource. Defaults to the repo set in the DSL.
-    - `:resource_provider`: The resource provider to use for the resource. Defaults to the resource provider set in the DSL. Must implement the `EctoPress.ResourceProvider` behaviour.
+    - `:only`: A list of function names to generate.
+    - `:except`: A list of function names to exclude.
+    - `:plural`: The plural name of the resource. Defaults to the pluralized form of the name using `Inflex.pluralize/1`.
+    - `:repo`: The repo to use for the resource. Defaults to the module level `:repo` option.
+    - `:resource_provider`: The resource provider to use for the resource. Defaults to the module level `:resource_provider` option. Must implement the `EctoPress.ResourceProvider` behaviour.
+
+  Functions that can be generated:
+    - `:get` -> `get_{name}(id, opts \\\\ [])`
+    - `:get!` -> `get_{name}!(id, opts \\\\ [])`
+    - `:get_by` -> `get_{name}_by(clauses, opts \\\\ [])`
+    - `:get_by!` -> `get_{name}_by!(clauses, opts \\\\[])`
+    - `:fetch` -> `fetch_{name}(id, opts \\\\ [])`
+    - `:fetch_by` -> `fetch_{name}_by(clauses, opts \\\\ [])`
+    - `:create` -> `create_{name}(attrs, opts \\\\ [])`
+    - `:update` -> `update_{name}(resource, attrs, opts \\\\ [])`
+    - `:delete` -> `delete_{name}(resource, opts \\\\ [])`
+    - `:list` -> `list_{plural}(clauses \\\\ [], opts \\\\ [])`
+    - `:changeset` -> `{name}_changeset(attrs \\\\ %{}, opts \\\\ [])`
+    - `:change` -> `change_{name}(resource, attrs \\\\ %{}, opts \\\\ [])`
   """
   defmacro resource(name, schema, opts \\ []) do
     quote do
@@ -50,7 +66,7 @@ defmodule EctoPress.DSL do
     end
   end
 
-  def generate_reflection_functions(resources) do
+  defp generate_reflection_functions(resources) do
     resources_list =
       for {name, schema, opts} <- resources do
         plural = opts[:plural] || Inflex.pluralize(name)
@@ -77,7 +93,7 @@ defmodule EctoPress.DSL do
     end
   end
 
-  def generate_functions(resources, global_opts) do
+  defp generate_functions(resources, global_opts) do
     global_resource_provider = global_opts[:resource_provider] || EctoPress.BaseResourceProvider
     global_repo = global_opts[:repo]
 
